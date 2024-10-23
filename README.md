@@ -297,7 +297,7 @@ void soundWaypoint(const int soundRes) {
   }
 }
 
-void finishWaypoint() {
+void finishWaypoint() { // REPLACE WITH VOID CELEBRATE()
   // keys and durations found in NOTES.h
   for (int i = 0; i < sizeof(music_key) / sizeof(int); ++i) {
     // quarter note = 1000 / 4, eighth note = 1000/8, etc. (Assuming 1 beat per sec)
