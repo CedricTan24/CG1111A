@@ -127,18 +127,6 @@ void loop() {
     return;
   }
 
-  // Sound Challenge
-  const int soundRes = getSound();
-  if (soundRes > 0) {
-    soundWaypoint(soundRes);
-    busy = false;
-    return;
-  }
-
-  // Finished!
-  finishWaypoint();
-}
-
 
 
 /********** Movement **********/
@@ -218,16 +206,6 @@ int getDist() {
   return 0;
 }
 
-// Sound Sensor: Return first hz
-int getSound() {
-  for (int i = 0; i < SOUND_NO; ++i) {
-    if (analogRead(SNDHI_PIN) > V_SNDHI) return 2;
-    if (analogRead(SNDLOW_PIN) > V_SNDLOW) return 1;
-    delay(MIC_WAIT);
-  }
-  return 0;
-}
-
 // Color Sensor: Return nearest colour
 long long square(const long long x) { return x * x; }
 int getColour() {
@@ -285,15 +263,6 @@ void colorWaypoint(const int colourRes) {
     case 3: uTurn(); break;
     case 4: doubleLeft(); break;
     case 5: doubleRight(); break;
-  }
-}
-
-void soundWaypoint(const int soundRes) {
-  // 1  low (100-300) : left
-  // 2  right (>3000) : right
-  switch (soundRes) {
-    case 1: turnLeft(); break;
-    case 2: turnRight(); break;
   }
 }
 
