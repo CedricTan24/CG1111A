@@ -15,10 +15,10 @@ MeRGBLed led(7);                        // RGB LED at pin 7
 // Normalised RGB Values for Colours
 #define RED_ARR         {185, 35, 35}             
 #define GRE_ARR         {45, 100, 60}
-#define YEL_ARR         {255, 175, 100}
-#define PUR_ARR         {155, 150, 200}
-#define BLU_ARR         {175, 240, 240}
-#define BLA_ARR         {0}
+#define ORA_ARR         {255, 165, 0}
+#define PINK_ARR        {255, 192, 203}
+#define BLU_ARR         {173, 216, 230}
+#define BLA_ARR         {0, 0, 0}
 #define NUMCOL          6               // No. of colours to detect
 
 // Calibration
@@ -41,7 +41,7 @@ float colourArray[] = {0};
 int whiteArray[] = WHI_VAL;
 int blackArray[] = BLA_VAL;//{315, 265, 305};
 int greyDiff[] = GRE_VAL;
-static int allColourArray[NUMCOL][3] = {BLA_ARR, RED_ARR, GRE_ARR, YEL_ARR, PUR_ARR, BLU_ARR};
+static int allColourArray[NUMCOL][3] = {BLA_ARR, RED_ARR, GRE_ARR, ORA_ARR, PINK_ARR, BLU_ARR};
 
 char colourStr[3][5] = {"R = ", "G = ", "B = "};
 
@@ -69,8 +69,8 @@ void printColour(int colourRes) {
     case 0: s="black"; break;
     case 1: s="red"; break;
     case 2: s="green"; break;
-    case 3: s="yellow"; break;
-    case 4: s="purple"; break;
+    case 3: s="orange"; break;
+    case 4: s="pink"; break;
     case 5: s="light blue"; break;
     default: s="not found"; break;
   }
