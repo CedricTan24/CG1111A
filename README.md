@@ -273,13 +273,13 @@ int norm(const int val, const int *low_mult) {
   return tmp;
 }
 
-void calibrateIR() {
+void calibrateIR() {                                                                       // Delete calibrateIR??
   Serial.println("===== CALIBRATING IR SENSORS (SIDE) =====");
 
   // Min values
   Serial.print("COVER SENSORS. Calibrating MIN in ");
   for (int i = CALLIBRATE_SEC; i > 0; --i) {
-    Serial.print(i); Serial.print(".. "); delay(1000);
+    Serial.print(i); Serial.print(".. ");  delay(1000);
   }
   irArray[0][0] = irArray[1][0] = 0;
   for (int i = 0; i < SOUND_NO; ++i) {
@@ -319,7 +319,7 @@ void calibrateIR() {
   Serial.print(irArray[0][0]); Serial.print(",");
   Serial.print(irArray[0][1]); Serial.print("},{");
   Serial.print(irArray[1][0]); Serial.print(",");
-  Serial.print(irArray[1][1]); Serial.println("}};");
+  Serial.print(irArray[1][1]); Serial.println("}};");                                             //End of delete
 }
 
 void calibrateWB() {
@@ -339,11 +339,11 @@ void calibrateWB() {
     ); led.show();
     delay(RGB_WAIT);
 
-    for (int j = 0; j < COLOUR_NO; ++j) {
-      whiteArray[i] += analogRead(LDR_PIN);
-      delay(LDR_WAIT);
-    }
-    whiteArray[i] /= COLOUR_NO;
+  for (int j = 0; j < COLOUR_NO; ++j) {
+   whiteArray[i] += analogRead(LDR_PIN);
+   delay(LDR_WAIT); 
+  }
+   whiteArray[i] /= COLOUR_NO;
   }
   led.setColor(0,0,0); led.show();
   Serial.println("done.");
