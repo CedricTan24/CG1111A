@@ -1,8 +1,6 @@
 #include <Wire.h>
 #include <MeMCore.h>
 #include <MeRGBLed.h>
-#include "Notes.h"
-// Notes.h code
 MeBuzzer buzzer;    // create the buzzer object 
  
 void celebrate() { 
@@ -55,13 +53,13 @@ MeBuzzer                buzzer;
 #define BLA_VAL         {255, 217, 243}
 #define GRE_VAL         {116, 108, 130}
 
-#define RED_ARR         {185,35,35}             // normalised rgb vals
+#define RED_ARR         {185, 35, 35}             // normalised rgb vals
 #define GRE_ARR         {45, 100, 60}
 #define ORA_ARR         {255, 175, 100}         //325,230,135
-#define PINK_ARR         {}
-#define BLU_ARR         {175,240,240}
-#define BLA_ARR         {0,0,0}
-#define NUMCOL          6                       // black, red, green, yellow, pink, blue
+#define PINK_ARR        {255, 192, 203}
+#define BLU_ARR         {173, 216, 230}  // change to light blue
+#define BLA_ARR         {0, 0, 0}
+#define NUMCOL          6                       // black, red, green, orange, pink, light blue
 
 // Calibration
 #define CALLIBRATE_SEC  3                       // delay b4 calibration
@@ -106,7 +104,7 @@ void stopMove(const int i);
 void loop() {
   if (busy) return;
 
-  if (lineFinder.readSensors() != S1_IN_S2_IN) { // both sensors not in black line
+  if (lineFinder.readSensors() != S1_IN_S2_IN) { // both sensors not in black line      // Delete, make it such that when sensors are on black line, it stops moving?
     moveForward();
     return;
   }
@@ -265,21 +263,17 @@ void colorWaypoint(const int colourRes) {
     case 5: doubleRight(); break;
   }
 }
-
-void finishWaypoint() { // REPLACE WITH VOID CELEBRATE()
-  // keys and durations found in NOTES.h
-  for (int i = 0; i < sizeof(music_key) / sizeof(int); ++i) {
-    // quarter note = 1000 / 4, eighth note = 1000/8, etc. (Assuming 1 beat per sec)
-    const int duration = 1000 / music_duration[i];
-    buzzer.tone(MUSIC_PIN, music_key[i], duration);
-
-    // to distinguish notes
-    delay(duration * 1.30);
-    buzzer.noTone(MUSIC_PIN);
-  }
-}
-
-
+void celebrate() { 
+  // Each of the following "function calls" plays a single tone.   
+  // The numbers in the bracket specify the frequency and the duration (ms) 
+  buzzer.tone(392, 200); 
+  buzzer.tone(523, 200); 
+  buzzer.tone(659, 200); 
+  buzzer.tone(784, 200); 
+  buzzer.tone(659, 150); 
+  buzzer.tone(784, 400); 
+  buzzer.noTone(); 
+} 
 
 /********** Calibration **********/
 // Used only for testing purposes, not for actual run.
