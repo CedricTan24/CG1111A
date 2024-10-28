@@ -39,6 +39,8 @@ MeBuzzer                buzzer;
 #define COL_DIST        5000                    // 10000
 #define WHI_VAL         {375, 335, 380}         // from LDR b4 normalisation
 #define BLA_VAL         {255, 217, 243}
+#define GRE_VAL         {116, 108, 130}
+//
 #define RED_ARR         {185, 35, 35}             // normalised rgb vals
 #define GRE_ARR         {45, 100, 60}
 #define ORA_ARR         {255, 165, 0}         //325,230,135
