@@ -2,18 +2,6 @@
 #include <MeMCore.h>
 #include <MeRGBLed.h>
 MeBuzzer buzzer;    // create the buzzer object 
- 
-void celebrate() { 
-  // Each of the following "function calls" plays a single tone.   
-  // The numbers in the bracket specify the frequency and the duration (ms) 
-  buzzer.tone(392, 200); 
-  buzzer.tone(523, 200); 
-  buzzer.tone(659, 200); 
-  buzzer.tone(784, 200); 
-  buzzer.tone(659, 150); 
-  buzzer.tone(784, 400); 
-  buzzer.noTone(); 
-} 
 
 /********** Settings **********/
 #define LEFTIR_PIN      A1
