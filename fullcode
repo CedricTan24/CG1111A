@@ -12,6 +12,8 @@ MeRGBLed led(7);           // Define the RGB LED on pin 7
 #define LEFT_WALL_THRESHOLD 30    // Threshold in cm for left wall proximity
 #define RIGHT_WALL_THRESHOLD 30   // Threshold in cm for right wall proximity
 
+MeBuzzer buzzer;  // Declare the buzzer
+
 void celebrate() {
   buzzer.tone(392, 200);
   buzzer.tone(523, 200);
