@@ -6,8 +6,12 @@ MeRGBLed led(7);           // Define the RGB LED on pin 7
 #define DELAY_TIME 200     // Delay time in milliseconds to allow LDR to stabilize
 #define MAXLED 255         // Maximum LED brightness
 #define IR_PIN 9  // Define the pin for the IR emitter
+#define IR_DETECTOR_PIN A3 // Define the IR detector pin (choose the actual pin connected to your IR detector)
+#define LINE_SENSOR_PIN A4 // Define the line sensor pin (choose the actual pin connected to your line sensor)
+#define BLACK_THRESHOLD 500 // Define the threshold value for black line detection (adjust based on testing)
 
-#define RIGHT_SENSOR_PIN A2   // Pin for the right IR or ultrasonic sensor
+#define LEFT_SENSOR_PIN A1 //IR Sensor
+#define RIGHT_SENSOR_PIN A2   //Ultrasonic Sensor (delete?)
 #define LEFT_WALL_THRESHOLD 30    // Threshold in cm for left wall proximity
 #define RIGHT_WALL_THRESHOLD 30   // Threshold in cm for right wall proximity
 
@@ -245,7 +249,6 @@ void loop()
 
 // Read ultrasonic sensing distance (choose an appropriate timeout)
 // Read IR sensing distance (turn off IR, read IR detector, turn on IR, read IR
-detector, estimate distance)
 // Check for black line
   if (isOnBlackLine()) {                  // Assuming you have a function to detect black line
     stopMotor();
@@ -271,8 +274,23 @@ detector, estimate distance)
 // else move forward
 }
 
+void takeActionBasedOnColor(const int colourRes) {
+  // red : left
+  // green : right
+  // orange : 180deg within grid
+  // pink : 2 left
+  // light blue : 2 right
+  switch (colourRes) {
+    case 1: turnLeft(); break;
+    case 2: turnRight(); break;
+    case 3: uTurn(); break;
+    case 4: doubleLeftTurn(); break;
+    case 5: doubleRightTurn(); break;
+  }
+}
+
 int getUltrasonicDistance() {
-  int distance = ultrasonic.distanceCm();  // Replace 'ultrasonic' with your MeUltrasonicSensor object
+  int distance = ultraSensor.distanceCm();  // Replace 'ultrasonic' with your MeUltrasonicSensor object
   return distance;
 }
 
