@@ -7,10 +7,14 @@ MeRGBLed led(7);           // Define the RGB LED on pin 7
 #define MAXLED 255         // Maximum LED brightness
 #define IR_PIN 9  // Define the pin for the IR emitter
 
-#define LEFT_SENSOR_PIN A1    // Pin for the left IR or ultrasonic sensor
 #define RIGHT_SENSOR_PIN A2   // Pin for the right IR or ultrasonic sensor
 #define LEFT_WALL_THRESHOLD 30    // Threshold in cm for left wall proximity
 #define RIGHT_WALL_THRESHOLD 30   // Threshold in cm for right wall proximity
+
+MeDCMotor motor_left(M1);   // Declare the left motor on port M1
+MeDCMotor motor_right(M2);  // Declare the right motor on port M2
+MeLineFollower          lineFinder(PORT_2);     
+MeUltrasonicSensor      ultraSensor(PORT_1);    
 
 MeBuzzer buzzer;  // Declare the buzzer
 
@@ -21,12 +25,12 @@ void celebrate() {
   buzzer.tone(784, 200);
   buzzer.tone(659, 150);
   buzzer.tone(784, 400);
-  buzzer.noTone()
+  buzzer.noTone();
 }
 
 void stopMotor() {
-  motor_left.stop;
-  motor_right.stop;
+  motor_left.run(0);
+  motor_right.run(0);
 }
 
 void moveForward() {
@@ -37,7 +41,7 @@ void moveForward() {
 void turnRight() {
   motor_left.run(255);   // Run the left motor at full speed
   motor_right.run(50);   // Run the right motor at half speed for a smoother turn
-  delay(2000)
+  delay(2000);
   motor_left.run(255);
   motor_right.run(255);
 }
@@ -45,7 +49,7 @@ void turnRight() {
 void turnLeft() { 
   motor_left.run(50);   // Run the left motor at full speed
   motor_right.run(255);   // Run the right motor at half speed for a smoother turn
-  delay(2000)
+  delay(2000);
   motor_left.run(255);
   motor_right.run(255);
   }
@@ -82,7 +86,7 @@ void doubleLeftTurn() {
   motor_left.run(0);
   motor_right.run(0);
 }
-}
+
 void doubleRightTurn() {
 // First right turn (90 degrees):
   motor_left.run(100);   // Left motor forward
@@ -110,30 +114,34 @@ void doubleRightTurn() {
 
 
 void nudgeLeft() {
-  leftMotor.run(speed);
-  rightMotor.run(-speed);
-  delay(TIMEDELAY);
+  motor_left.run(100);
+  motor_right.run(-100);
+  delay(500);
 }
 
 void nudgeRight() {
-  leftMotor.run(-speed);
-  rightMotor.run(speed);
-  delay(TIMEDELAY);
+  motor_left.run(-100);
+  motor_right.run(100);
+  delay(500);
 }
 
 void shineIR() {
   pinMode(IR_PIN, OUTPUT);      // Set the IR pin as an output
   digitalWrite(IR_PIN, HIGH);   // Turn on the IR emitter
-// Code for turning on the IR emitter only}
+// Code for turning on the IR emitter only
+}
 void shineRed() {
   led.setColor(255, 0, 0);  // Set LED to red (255 for red, 0 for green, 0 for blue)
-  led.show();               // Apply the color setting to the LED// Code for turning on the red LED only}
+  led.show();               // Apply the color setting to the LED// Code for turning on the red LED only
+  }
 void shineGreen() {
   led.setColor(0, 255, 0);  // Set LED to green (0 for red, 255 for green, 0 for blue)
-  led.show();               // Apply the color setting to the LED// Code for turning on the green LED only}
+  led.show();               // Apply the color setting to the LED// Code for turning on the green LED only
+  }
 void shineBlue() {
   led.setColor(0, 0, 255);  // Set LED to blue (0 for red, 0 for green, 255 for blue)
-  led.show();               // Apply the color setting to the LED// Code for turning on the blue LED only}
+  led.show();               // Apply the color setting to the LED// Code for turning on the blue LED only
+  }
 int detectColour()
 {
   float colourArray[3] = {0};
