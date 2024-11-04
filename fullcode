@@ -196,16 +196,6 @@ void loop()
   int ultrasonicDistance = getUltrasonicDistance(); // Get ultrasonic distance
   int irDistance = getIRDistance();                 // Get IR distance
 
-  if (isNearLeftWall()) {
-    nudgeRight();  // Nudge right if too close to the left wall
-  } else if (isNearRightWall()) {
-    nudgeLeft();   // Nudge left if too close to the right wall
-  } else {
-    moveForward(); // Move forward if no walls are too close
-  }
-  delay(100); // Adjust delay as needed
-
-  delay(100); // Adjust delay as needed for loop timing
 // Read ultrasonic sensing distance (choose an appropriate timeout)
 // Read IR sensing distance (turn off IR, read IR detector, turn on IR, read IR
 detector, estimate distance)
