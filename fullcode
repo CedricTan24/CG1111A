@@ -7,6 +7,11 @@ MeRGBLed led(7);           // Define the RGB LED on pin 7
 #define MAXLED 255         // Maximum LED brightness
 #define IR_PIN 9  // Define the pin for the IR emitter
 
+#define LEFT_SENSOR_PIN A1    // Pin for the left IR or ultrasonic sensor
+#define RIGHT_SENSOR_PIN A2   // Pin for the right IR or ultrasonic sensor
+#define LEFT_WALL_THRESHOLD 30    // Threshold in cm for left wall proximity
+#define RIGHT_WALL_THRESHOLD 30   // Threshold in cm for right wall proximity
+
 void celebrate() {
   buzzer.tone(392, 200);
   buzzer.tone(523, 200);
@@ -188,11 +193,99 @@ void setup()
 void loop()
 {
   moveFoward();
+  int ultrasonicDistance = getUltrasonicDistance(); // Get ultrasonic distance
+  int irDistance = getIRDistance();                 // Get IR distance
+
+  if (isNearLeftWall()) {
+    nudgeRight();  // Nudge right if too close to the left wall
+  } else if (isNearRightWall()) {
+    nudgeLeft();   // Nudge left if too close to the right wall
+  } else {
+    moveForward(); // Move forward if no walls are too close
+  }
+  delay(100); // Adjust delay as needed
+
+  delay(100); // Adjust delay as needed for loop timing
 // Read ultrasonic sensing distance (choose an appropriate timeout)
 // Read IR sensing distance (turn off IR, read IR detector, turn on IR, read IR
 detector, estimate distance)
+// Check for black line
+  if (isOnBlackLine()) {                  // Assuming you have a function to detect black line
+    stopMotor();
+    int color = detectColour();           // Detect color when on black line
+    takeActionBasedOnColor(color);        // Take action based on detected color
+  } 
+  // If too close to left wall
+  else if (ultrasonicDistance < 10 && isNearLeftWall()) { // Example threshold and condition for left wall
+    nudgeRight();                         // Nudge right if too close to the left wall
+  } 
+  // If too close to right wall
+  else if (ultrasonicDistance < 10 && isNearRightWall()) { // Example threshold and condition for right wall
+    nudgeLeft();                          // Nudge left if too close to the right wall
+  } 
+  else {
+    moveForward();                        // Move forward if all conditions are normal
+  }
+
+  delay(100); // Adjust delay as needed for smooth operation
 // if within black line, stop motor, detect colour, and take corresponding action
 // else if too near to left wall, nudge right
 // else if too near to right wall, nudge left
 // else move forward
+}
+
+int getUltrasonicDistance() {
+  int distance = ultrasonic.distanceCm();  // Replace 'ultrasonic' with your MeUltrasonicSensor object
+  return distance;
+}
+
+// IR distance reading
+int getIRDistance() {
+  digitalWrite(IR_PIN, HIGH);
+  delay(10);
+  int reading = analogRead(IR_DETECTOR_PIN); // Replace 'IR_DETECTOR_PIN' with your actual IR sensor pin
+  digitalWrite(IR_PIN, LOW);
+  return reading;
+}
+
+// Example black line detection (using a threshold for IR sensor readings)
+bool isOnBlackLine() {
+  int lineSensorValue = analogRead(LINE_SENSOR_PIN); // Replace with your line sensor pin
+  return lineSensorValue < BLACK_THRESHOLD;          // Replace 'BLACK_THRESHOLD' with your black line threshold
+}
+
+// Function to read the left wall distance
+int getLeftWallDistance() {
+  int leftDistance = analogRead(LEFT_SENSOR_PIN);  // Adjust for IR or ultrasonic distance
+  // If using an ultrasonic sensor, use ultrasonic.distanceCm() method
+  // Example for MeUltrasonicSensor:
+  // MeUltrasonicSensor leftUltrasonicSensor(PORT_X);
+  // int leftDistance = leftUltrasonicSensor.distanceCm();
+  return leftDistance;
+}
+
+// Function to read the right wall distance
+int getRightWallDistance() {
+  int rightDistance = analogRead(RIGHT_SENSOR_PIN); // Adjust for IR or ultrasonic distance
+  // If using an ultrasonic sensor, use ultrasonic.distanceCm() method
+  // Example for MeUltrasonicSensor:
+  // MeUltrasonicSensor rightUltrasonicSensor(PORT_Y);
+  // int rightDistance = rightUltrasonicSensor.distanceCm();
+  return rightDistance;
+}
+
+bool isNearLeftWall() {
+  int leftDistance = getLeftWallDistance();
+  Serial.print("Left Wall Distance: ");
+  Serial.println(leftDistance);
+  
+  return leftDistance < LEFT_WALL_THRESHOLD; // Returns true if too close to the left wall
+}
+
+bool isNearRightWall() {
+  int rightDistance = getRightWallDistance();
+  Serial.print("Right Wall Distance: ");
+  Serial.println(rightDistance);
+  
+  return rightDistance < RIGHT_WALL_THRESHOLD; // Returns true if too close to the right wall
 }
