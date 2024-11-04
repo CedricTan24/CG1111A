@@ -203,7 +203,7 @@ void setup()
 }
 void loop()
 {
-  moveFoward();
+  moveForward();
   int ultrasonicDistance = getUltrasonicDistance(); // Get ultrasonic distance
   int irDistance = getIRDistance();                 // Get IR distance
 
