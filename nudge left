@@ -1,5 +1,0 @@
-void nudgeLeft() {
-  leftMotor.run(speed);
-  rightMotor.run(-speed);
-  delay(TIMEDELAY);
-}
