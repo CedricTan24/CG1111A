@@ -22,12 +22,6 @@ void celebrate() {
   buzzer.noTone()
 }
 
-void nudgeLeft() {
-  leftMotor.run(speed);
-  rightMotor.run(-speed);
-  delay(TIMEDELAY);
-}
-
 void stopMotor() {
   motor_left.stop;
   motor_right.stop;
@@ -111,9 +105,20 @@ void doubleRightTurn() {
   motor_right.run(0);
 // Code for double right turn
 }
-void nudgeLeft() {// Code for nudging slightly to the left for some short interval}
-void nudgeRight() {// Code for nudging slightly to the right for some short
-interval}
+
+
+void nudgeLeft() {
+  leftMotor.run(speed);
+  rightMotor.run(-speed);
+  delay(TIMEDELAY);
+}
+
+void nudgeRight() {
+  leftMotor.run(-speed);
+  rightMotor.run(speed);
+  delay(TIMEDELAY);
+}
+
 void shineIR() {
   pinMode(IR_PIN, OUTPUT);      // Set the IR pin as an output
   digitalWrite(IR_PIN, HIGH);   // Turn on the IR emitter
