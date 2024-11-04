@@ -22,6 +22,12 @@ void celebrate() {
   buzzer.noTone()
 }
 
+void nudgeLeft() {
+  leftMotor.run(speed);
+  rightMotor.run(-speed);
+  delay(TIMEDELAY);
+}
+
 void stopMotor() {
   motor_left.stop;
   motor_right.stop;
