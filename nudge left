@@ -1,3 +1,5 @@
 void nudgeLeft() {
-  for
+  for(long i = 0; i < 10; i += 1) {
+  leftMotor.run(speed);
+  rightMotor.run(-speed);
 }
