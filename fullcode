@@ -1,5 +1,12 @@
 #include <MeMCore.h>
 
+#define LDR_PIN A6         // Define the LDR pin on A6
+MeRGBLed led(7);           // Define the RGB LED on pin 7
+
+#define DELAY_TIME 200     // Delay time in milliseconds to allow LDR to stabilize
+#define MAXLED 255         // Maximum LED brightness
+#define IR_PIN 9  // Define the pin for the IR emitter
+
 void celebrate() {
   buzzer.tone(392, 200);
   buzzer.tone(523, 200);
@@ -96,12 +103,79 @@ void doubleRightTurn() {
 void nudgeLeft() {// Code for nudging slightly to the left for some short interval}
 void nudgeRight() {// Code for nudging slightly to the right for some short
 interval}
-void shineIR() {// Code for turning on the IR emitter only}
-void shineRed() {// Code for turning on the red LED only}
-void shineGreen() {// Code for turning on the green LED only}
-void shineBlue() {// Code for turning on the blue LED only}
+void shineIR() {
+  pinMode(IR_PIN, OUTPUT);      // Set the IR pin as an output
+  digitalWrite(IR_PIN, HIGH);   // Turn on the IR emitter
+// Code for turning on the IR emitter only}
+void shineRed() {
+  led.setColor(255, 0, 0);  // Set LED to red (255 for red, 0 for green, 0 for blue)
+  led.show();               // Apply the color setting to the LED// Code for turning on the red LED only}
+void shineGreen() {
+  led.setColor(0, 255, 0);  // Set LED to green (0 for red, 255 for green, 0 for blue)
+  led.show();               // Apply the color setting to the LED// Code for turning on the green LED only}
+void shineBlue() {
+  led.setColor(0, 0, 255);  // Set LED to blue (0 for red, 0 for green, 255 for blue)
+  led.show();               // Apply the color setting to the LED// Code for turning on the blue LED only}
 int detectColour()
 {
+  float colourArray[3] = {0};
+
+  // Shine Red, read LDR
+  led.setColor(255, 0, 0);         // Set LED to red
+  led.show();
+  delay(DELAY_TIME);               // Wait for light to stabilize
+  colourArray[0] = analogRead(LDR_PIN); // Read LDR value for red
+  Serial.print("Red value: ");
+  Serial.println(colourArray[0]);
+
+  // Shine Green, read LDR
+  led.setColor(0, 255, 0);         // Set LED to green
+  led.show();
+  delay(DELAY_TIME);
+  colourArray[1] = analogRead(LDR_PIN); // Read LDR value for green
+  Serial.print("Green value: ");
+  Serial.println(colourArray[1]);
+
+  // Shine Blue, read LDR
+  led.setColor(0, 0, 255);         // Set LED to blue
+  led.show();
+  delay(DELAY_TIME);
+  colourArray[2] = analogRead(LDR_PIN); // Read LDR value for blue
+  Serial.print("Blue value: ");
+  Serial.println(colourArray[2]);
+
+  // Turn off LED after reading
+  led.setColor(0, 0, 0);
+  led.show();
+
+  // Algorithm to decode color based on RGB readings
+  int detectedColor = -1;
+  float minDistance = 5000;  // Minimum distance threshold for comparison
+  static float predefinedColors[6][3] = { 
+    {0, 0, 0},          // Black
+    {185, 35, 35},      // Red
+    {45, 100, 60},      // Green
+    {255, 165, 0},      // Orange
+    {255, 192, 203},    // Pink
+    {173, 216, 230}     // Light Blue
+  };
+
+  for (int i = 0; i < 6; i++) {
+    float distance = 0;
+    for (int j = 0; j < 3; j++) {
+      distance += (predefinedColors[i][j] - colourArray[j]) * (predefinedColors[i][j] - colourArray[j]);
+    }
+    if (distance < minDistance) {
+      minDistance = distance;
+      detectedColor = i;
+    }
+  }
+
+  // Output the detected color to Serial Monitor
+  Serial.print("Detected color index: ");
+  Serial.println(detectedColor);
+
+  return detectedColor;  // Return the index of the detected color
 // Shine Red, read LDR after some delay
 // Shine Green, read LDR after some delay
 // Shine Blue, read LDR after some delay
