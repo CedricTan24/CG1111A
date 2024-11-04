@@ -199,6 +199,32 @@ int detectColour()
 }
 void setup()
 {
+// Initialize Serial for debugging
+  Serial.begin(9600);
+  
+  // Configure pin modes for sensors
+  pinMode(LEFT_SENSOR_PIN, INPUT);       // Left wall sensor
+  pinMode(RIGHT_SENSOR_PIN, INPUT);      // Right wall sensor
+  
+  // Configure pin modes for IR emitter and detector
+  pinMode(IR_PIN, OUTPUT);               // IR emitter
+  pinMode(IR_DETECTOR_PIN, INPUT);       // IR detector
+  
+  // Configure pin mode for line sensor
+  pinMode(LINE_SENSOR_PIN, INPUT);       // Line sensor pin
+  
+  // Stop the motors initially
+  stopMotor();
+
+  // Initialize the RGB LED in an off state
+  led.setColor(0, 0, 0);    // Turn off the RGB LED
+  led.show();
+
+  // Set initial state for IR emitter
+  digitalWrite(IR_PIN, LOW);  // Ensure IR emitter is off
+
+  // Provide feedback for setup completion
+  Serial.println("Setup Complete. Ready to start.");
 // Configure pinMode for A0, A1, A2, A3
 }
 void loop()
