@@ -3,6 +3,9 @@
 greyDiff[3];
 whiteArray[3];
 blackArray[3];
+#define red 0
+#define green 1
+#define blue 2
 
 void shineRed() {
     digitalWrite(LOGIC1, LOW);
