@@ -1,8 +1,9 @@
 #define LOGIC1 11
 #define LOGIC2 12
-greyDiff[3];
-whiteArray[3];
-blackArray[3];
+#define LDR_PIN 0
+int greyDiff[3];
+int whiteArray[3];
+int blackArray[3];
 #define red 0
 #define green 1
 #define blue 2
@@ -34,8 +35,6 @@ void setup() {
   Serial.begin(9600); 
   pinMode(LOGIC1, OUTPUT);
   pinMode(LOGIC2, OUTPUT);
-  pinMode(RETURNVOLTAGE, INPUT);
-  //setBalance(); 
 }
 
 void setBalance() {
@@ -43,9 +42,9 @@ void setBalance() {
   delay(5000);  
   for (int i = 0; i <= 2; i++) {
     shine(i);
-    delay(RGBwait);
+    delay(300);
     whiteArray[i] = getAvgReading(5);  
-    delay(RGBwait);
+    delay(300);
   }
 
 
@@ -54,9 +53,9 @@ void setBalance() {
   //go through one colour at a time, set the minimum reading for red, green and blue to the black array
   for (int i = 0; i <= 2; i++) {
     shine(i);
-    delay(RGBwait);
+    delay(300);
     blackArray[i] = getAvgReading(5);
-    delay(RGBwait);
+    delay(300);
 
     greyDiff[i] = whiteArray[i] - blackArray[i];
   }
@@ -72,24 +71,24 @@ int detectColour()
   // Shine Red, read LDR
   digitalWrite(11, LOW);
   digitalWrite(12, LOW);
-  delay(DELAY_TIME);               // Wait for light to stabilize
-  colourArray[0] = ((analogRead(LDR_PIN) - black[0]) / greyDiff[0]) * 255;
+  delay(1000);               // Wait for light to stabilize
+  colourArray[0] = ((analogRead(LDR_PIN) - blackArray[0]) / greyDiff[0]) * 255;
   Serial.print("Red value: ");
   Serial.println(colourArray[0]);
 
   // Shine Green, read LDR
   digitalWrite(11, LOW);
   digitalWrite(12, HIGH);
-  delay(DELAY_TIME);
-  colourArray[1] = ((analogRead(LDR_PIN) - black[1]) / greyDiff[1]) * 255;
+  delay(1000);
+  colourArray[1] = ((analogRead(LDR_PIN) - blackArray[1]) / greyDiff[1]) * 255;
   Serial.print("Green value: ");
   Serial.println(colourArray[1]);
 
   // Shine Blue, read LDR
   digitalWrite(11, HIGH);
   digitalWrite(12, LOW);
-  delay(DELAY_TIME);
-  colourArray[2] = ((analogRead(LDR_PIN) - black[2]) / greyDiff[2]) * 255;
+  delay(1000);
+  colourArray[2] = ((analogRead(LDR_PIN) - blackArray[2]) / greyDiff[2]) * 255;
   Serial.print("Blue value: ");
   Serial.println(colourArray[2]);
 }
@@ -97,7 +96,7 @@ int detectColour()
 int getAvgReading(int times) {
   int total = 0;
   for (int i = 0; i < times; i++) {
-    total += analogRead(RETURNVOLTAGE);
+    total += analogRead(A0);
     delay(10);
   }
   return total / times;
@@ -109,5 +108,3 @@ void loop() {
   detectColour();
 }
 }
-
-
