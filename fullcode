@@ -12,8 +12,8 @@ MeRGBLed led(7);           // Define the RGB LED on pin 7
 
 #define LEFT_SENSOR_PIN A1 //IR Sensor
 #define RIGHT_SENSOR_PIN A2   //Ultrasonic Sensor (delete?)
-#define LEFT_WALL_THRESHOLD 30    // Threshold in cm for left wall proximity
-#define RIGHT_WALL_THRESHOLD 30   // Threshold in cm for right wall proximity
+#define LEFT_WALL_THRESHOLD 5    // Threshold in cm for left wall proximity
+#define RIGHT_WALL_THRESHOLD 5   // Threshold in cm for right wall proximity
 
 MeDCMotor motor_left(M1);   // Declare the left motor on port M1
 MeDCMotor motor_right(M2);  // Declare the right motor on port M2
@@ -217,12 +217,12 @@ void setup()
   Serial.begin(9600);
   
   // Configure pin modes for sensors
-  pinMode(LEFT_SENSOR_PIN, INPUT);       // Left wall sensor
-  pinMode(RIGHT_SENSOR_PIN, INPUT);      // Right wall sensor
+  pinMode(LEFT_SENSOR_PIN, INPUT);       // Left wall sensor IR, A1
+  pinMode(RIGHT_SENSOR_PIN, INPUT);      // Right wall sensor, UltraSonic, A2
   
   // Configure pin modes for IR emitter and detector
-  pinMode(IR_PIN, OUTPUT);               // IR emitter
-  pinMode(IR_DETECTOR_PIN, INPUT);       // IR detector
+  pinMode(IR_PIN, OUTPUT);               // IR emitter, A3
+  pinMode(IR_DETECTOR_PIN, INPUT);       // IR detector // delete?
   
   // Configure pin mode for line sensor
   pinMode(LINE_SENSOR_PIN, INPUT);       // Line sensor pin
