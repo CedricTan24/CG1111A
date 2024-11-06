@@ -153,7 +153,7 @@ int detectColour()
   led.setColor(255, 0, 0);         // Set LED to red
   led.show();
   delay(DELAY_TIME);               // Wait for light to stabilize
-  colourArray[0] = analogRead(LDR_PIN); // Read LDR value for red
+  colourArray[0] = ((analogRead(LDR_PIN) - black[0]) / greyDiff[0]) * 255;
   Serial.print("Red value: ");
   Serial.println(colourArray[0]);
 
@@ -161,7 +161,7 @@ int detectColour()
   led.setColor(0, 255, 0);         // Set LED to green
   led.show();
   delay(DELAY_TIME);
-  colourArray[1] = analogRead(LDR_PIN); // Read LDR value for green
+  colourArray[1] = ((analogRead(LDR_PIN) - black[1]) / greyDiff[1]) * 255;
   Serial.print("Green value: ");
   Serial.println(colourArray[1]);
 
@@ -169,7 +169,7 @@ int detectColour()
   led.setColor(0, 0, 255);         // Set LED to blue
   led.show();
   delay(DELAY_TIME);
-  colourArray[2] = analogRead(LDR_PIN); // Read LDR value for blue
+  colourArray[2] = ((analogRead(LDR_PIN) - black[2]) / greyDiff[2]) * 255;
   Serial.print("Blue value: ");
   Serial.println(colourArray[2]);
 
