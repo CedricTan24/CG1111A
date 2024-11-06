@@ -205,10 +205,6 @@ int detectColour()
   Serial.println(detectedColor);
 
   return detectedColor;  // Return the index of the detected color
-// Shine Red, read LDR after some delay
-// Shine Green, read LDR after some delay
-// Shine Blue, read LDR after some delay
-// Run algorithm for colour decoding
 }
 void setup()
 {
