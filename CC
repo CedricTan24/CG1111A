@@ -1,0 +1,29 @@
+int detectColour()
+{
+  float colourArray[3] = {0};
+
+  // Shine Red, read LDR
+  digitalWrite(11, LOW);
+  digitalWrite(12, LOW);
+  delay(DELAY_TIME);               // Wait for light to stabilize
+  colourArray[0] = ((analogRead(LDR_PIN) - black[0]) / greyDiff[0]) * 255;
+  Serial.print("Red value: ");
+  Serial.println(colourArray[0]);
+
+  // Shine Green, read LDR
+  digitalWrite(11, LOW);
+  digitalWrite(12, HIGH);
+  delay(DELAY_TIME);
+  colourArray[1] = ((analogRead(LDR_PIN) - black[1]) / greyDiff[1]) * 255;
+  Serial.print("Green value: ");
+  Serial.println(colourArray[1]);
+
+  // Shine Blue, read LDR
+  digitalWrite(11, HIGH);
+  digitalWrite(12, LOW);
+  delay(DELAY_TIME);
+  colourArray[2] = ((analogRead(LDR_PIN) - black[2]) / greyDiff[2]) * 255;
+  Serial.print("Blue value: ");
+  Serial.println(colourArray[2]);
+}
+
