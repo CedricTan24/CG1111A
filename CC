@@ -1,5 +1,69 @@
+#define LOGIC1 11
+#define LOGIC2 12
+greyDiff[3];
+whiteArray[3];
+blackArray[3];
+
+void shineRed() {
+    digitalWrite(LOGIC1, LOW);
+    digitalWrite(LOGIC2, LOW);
+}
+void shineGreen() {
+    digitalWrite(LOGIC1, HIGH);
+    digitalWrite(LOGIC2, LOW);
+}
+void shineBlue() {
+    digitalWrite(LOGIC1, LOW);
+    digitalWrite(LOGIC2, HIGH);
+}
+
+void shine(int c) {
+  if (c == red) {
+    shineRed();
+  } else if (c == green) {
+    shineGreen();
+  } else {
+    shineBlue();
+  }
+}
+
+void setup() {
+  Serial.begin(9600); 
+  pinMode(LOGIC1, OUTPUT);
+  pinMode(LOGIC2, OUTPUT);
+  pinMode(RETURNVOLTAGE, INPUT);
+  //setBalance(); 
+}
+
+void setBalance() {
+  Serial.println("Put White Sample For Calibration ...");
+  delay(5000);  
+  for (int i = 0; i <= 2; i++) {
+    shine(i);
+    delay(RGBwait);
+    whiteArray[i] = getAvgReading(5);  
+    delay(RGBwait);
+  }
+
+
+  Serial.println("Put Black Sample For Calibration ...");
+  delay(5000);  //delay for five seconds for getting sample ready
+  //go through one colour at a time, set the minimum reading for red, green and blue to the black array
+  for (int i = 0; i <= 2; i++) {
+    shine(i);
+    delay(RGBwait);
+    blackArray[i] = getAvgReading(5);
+    delay(RGBwait);
+
+    greyDiff[i] = whiteArray[i] - blackArray[i];
+  }
+
+  Serial.println("Colour Sensor Is Ready.");
+  delay(5000);
+} 
+
 int detectColour()
-{
+{ 
   float colourArray[3] = {0};
 
   // Shine Red, read LDR
@@ -26,4 +90,21 @@ int detectColour()
   Serial.print("Blue value: ");
   Serial.println(colourArray[2]);
 }
+
+int getAvgReading(int times) {
+  int total = 0;
+  for (int i = 0; i < times; i++) {
+    total += analogRead(RETURNVOLTAGE);
+    delay(10);
+  }
+  return total / times;
+}
+
+void loop() {
+  setBalance();
+  for (long i = 0; i < 5; i += 1) {
+  detectColour();
+}
+}
+
 
