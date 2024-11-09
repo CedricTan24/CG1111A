@@ -180,7 +180,7 @@ int detectColour()
   int detectedColor = -1;
   float minDistance = 5000;  // Minimum distance threshold for comparison
   static float predefinedColors[6][3] = { 
-    {0, 0, 0},          // Black
+    {255, 255, 255},    // White
     {185, 35, 35},      // Red
     {45, 100, 60},      // Green
     {255, 165, 0},      // Orange
@@ -280,7 +280,9 @@ void takeActionBasedOnColor(const int colourRes) {
   // orange : 180deg within grid
   // pink : 2 left
   // light blue : 2 right
+  // white : Stop, play celebratory music
   switch (colourRes) {
+    case 0: stopMotor(); celebrate(); break:
     case 1: turnLeft(); break;
     case 2: turnRight(); break;
     case 3: uTurn(); break;
