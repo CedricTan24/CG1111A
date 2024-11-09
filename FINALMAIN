@@ -42,23 +42,23 @@ void moveForward() {
 
 void turnRight() {
   motor_left.run(255);   // Run the left motor at full speed
-  motor_right.run(50);   // Run the right motor at half speed for a smoother turn
+  motor_right.run(-50);   // Run the right motor at half speed for a smoother turn
   delay(2000);
   motor_left.run(255);
-  motor_right.run(255);
+  motor_right.run(-255);
 }
 
 void turnLeft() { 
   motor_left.run(50);   // Run the left motor at full speed
-  motor_right.run(255);   // Run the right motor at half speed for a smoother turn
+  motor_right.run(-255);   // Run the right motor at half speed for a smoother turn
   delay(2000);
   motor_left.run(255);
-  motor_right.run(255);
+  motor_right.run(-255);
   }
 
 void uTurn() {
   motor_left.run(100);    // Run the left motor forward
-  motor_right.run(-100);  // Run the right motor backward
+  motor_right.run(100);  // Run the right motor backward
   // Adjust the delay to control the time needed for a full U-turn (about 180 degrees)
   delay(1500);  // Adjust this value based on testing (e.g., 1500 milliseconds for 1.5 seconds)
   // Stop the motors after the U-turn
@@ -68,19 +68,19 @@ void uTurn() {
 
 void doubleLeftTurn() {
   motor_left.run(-100);  // Left motor backward
-  motor_right.run(100);  // Right motor forward
+  motor_right.run(-100);  // Right motor forward
 
   delay(700);  // Adjust the delay to achieve a 90-degree left turn
 
   // Move forward between the turns:
   motor_left.run(100);  // Both motors forward
-  motor_right.run(100);
+  motor_right.run(-100);
 
   delay(1000);  // Move forward for 1 second (adjust as needed)
 
   // Second left turn (90 degrees):
   motor_left.run(-100);  // Left motor backward
-  motor_right.run(100);  // Right motor forward
+  motor_right.run(-100);  // Right motor forward
 
   delay(700);  // Adjust this delay for the second 90-degree left turn
 
@@ -92,19 +92,19 @@ void doubleLeftTurn() {
 void doubleRightTurn() {
 // First right turn (90 degrees):
   motor_left.run(100);   // Left motor forward
-  motor_right.run(-100); // Right motor backward
+  motor_right.run(100); // Right motor backward
 
   delay(700);  // Adjust the delay to achieve a 90-degree right turn
 
   // Move forward between the turns:
   motor_left.run(100);  // Both motors forward
-  motor_right.run(100);
+  motor_right.run(-100);
 
   delay(1000);  // Move forward for 1 second (adjust as needed)
 
   // Second right turn (90 degrees):
   motor_left.run(100);   // Left motor forward
-  motor_right.run(-100); // Right motor backward
+  motor_right.run(100); // Right motor backward
 
   delay(700);  // Adjust this delay for the second 90-degree right turn
 
@@ -117,41 +117,175 @@ void doubleRightTurn() {
 
 void nudgeLeft() {
   motor_left.run(100);
-  motor_right.run(-100);
+  motor_right.run(100);
   delay(500);
 }
 
 void nudgeRight() {
   motor_left.run(-100);
-  motor_right.run(100);
+  motor_right.run(-100);
   delay(500);
 }
-void shineIR() {// Code for turning on the IR emitter only}
-void shineRed() {// Code for turning on the red LED only}
-void shineGreen() {// Code for turning on the green LED only}
-void shineBlue() {// Code for turning on the blue LED only}
+void shineIR() {
+  pinMode(IR_PIN, OUTPUT);      // Set the IR pin as an output
+  digitalWrite(IR_PIN, HIGH);   // Turn on the IR emitter
+// Code for turning on the IR emitter only
+}
+void shineRed() {
+  led.setColor(255, 0, 0);  // Set LED to red (255 for red, 0 for green, 0 for blue)
+  led.show();               // Apply the color setting to the LED// Code for turning on the red LED only
+  }
+void shineGreen() {
+  led.setColor(0, 255, 0);  // Set LED to green (0 for red, 255 for green, 0 for blue)
+  led.show();               // Apply the color setting to the LED// Code for turning on the green LED only
+  }
+void shineBlue() {
+  led.setColor(0, 0, 255);  // Set LED to blue (0 for red, 0 for green, 255 for blue)
+  led.show();               // Apply the color setting to the LED// Code for turning on the blue LED only
+  }
 
 int detectColour()
 {
-// Shine Red, read LDR after some delay
-// Shine Green, read LDR after some delay
-// Shine Blue, read LDR after some delay
-// Run algorithm for colour decoding
+  float colourArray[3] = {0};
+
+  // Shine Red, read LDR
+  digitalWrite(11, LOW);
+  digitalWrite(12, LOW);
+  delay(DELAY_TIME);               // Wait for light to stabilize
+  colourArray[0] = ((analogRead(LDR_PIN) - black[0]) / greyDiff[0]) * 255;
+  Serial.print("Red value: ");
+  Serial.println(colourArray[0]);
+
+  // Shine Green, read LDR
+  digitalWrite(11, LOW);
+  digitalWrite(12, HIGH);
+  delay(DELAY_TIME);
+  colourArray[1] = ((analogRead(LDR_PIN) - black[1]) / greyDiff[1]) * 255;
+  Serial.print("Green value: ");
+  Serial.println(colourArray[1]);
+
+  // Shine Blue, read LDR
+  digitalWrite(11, HIGH);
+  digitalWrite(12, LOW);
+  delay(DELAY_TIME);
+  colourArray[2] = ((analogRead(LDR_PIN) - black[2]) / greyDiff[2]) * 255;
+  Serial.print("Blue value: ");
+  Serial.println(colourArray[2]);
+
+  // Turn off LED after reading
+  led.setColor(0, 0, 0);
+  led.show();
+
+  // Algorithm to decode color based on RGB readings
+  int detectedColor = -1;
+  float minDistance = 5000;  // Minimum distance threshold for comparison
+  static float predefinedColors[6][3] = { 
+    {0, 0, 0},          // Black
+    {185, 35, 35},      // Red
+    {45, 100, 60},      // Green
+    {255, 165, 0},      // Orange
+    {255, 192, 203},    // Pink
+    {173, 216, 230}     // Light Blue
+  };
+
+  for (int i = 0; i < 6; i++) {
+    float distance = 0;
+    for (int j = 0; j < 3; j++) {
+      distance += (predefinedColors[i][j] - colourArray[j]) * (predefinedColors[i][j] - colourArray[j]);
+    }
+    if (distance < minDistance) {
+      minDistance = distance;
+      detectedColor = i;
+    }
+  }
+
+  // Output the detected color to Serial Monitor
+  Serial.print("Detected color index: ");
+  Serial.println(detectedColor);
+
+  return detectedColor;  // Return the index of the detected color
 }
 
 void setup()
 {
+  Serial.begin(9600);
+  pinMode(A1, INPUT);
+  pinMode(TRIGGER, OUTPUT);
+  digitalWrite(TRIGGER, LOW);
+  pinMode(11, OUTPUT);
+  pinMode(12, OUTPUT);
+  digitalWrite(11, LOW);
+  digitalWrite(12, LOW);
+
+  stopMotor();
+
+  // Initialize the RGB LED in an off state
+  led.setColor(0, 0, 0);    // Turn off the RGB LED
+  led.show();
+
+  // Set initial state for IR emitter
+  digitalWrite(IR_PIN, LOW);  // Ensure IR emitter is off
+
 // Configure pinMode for A0, A1, A2, A3
 }
 
 void loop()
 {
-// Read ultrasonic sensing distance (choose an appropriate timeout)
-// Read IR sensing distance (turn off IR, read IR detector, turn on IR, read IR detector, estimate distance)
-// if within black line, stop motor, detect colour, and take corresponding action
-// 	else if too near to left wall, nudge right
-// 	else if too near to right wall, nudge left
-// 	else move forward
+  int ULTRASONIC = getUltrasonic(); // Read ultrasonic sensing distance (choose an appropriate timeout)
+  int IR = getIR(); // Read IR sensing distance (turn off IR, read IR detector, turn on IR, read IR detector, estimate distance)
+  if (lineFinder.readSensors() == S1_IN_S2_IN) { // if detect black line, it stops
+    stopMotor();
+    int color = detectColour();           // Detect color when on black line
+    takeActionBasedOnColor(color);        // Take action based on detected color
+    return;
+  } // if within black line, stop motor, detect colour, and take corresponding action
+  else if (ULTRASONIC > 600)
+{
+nudgeRight();
+} // 	else if too near to left wall, nudge right
+else if (IR > 600)
+{
+nudgeLeft();
+} // 	else if too near to right wall, nudge left
+else 
+{
+moveForward(); 
+} // 	else move forward
 }
 
+int getUltrasonic()
+{
+  pinMode(TRIGGER, OUTPUT);
+  digitalWrite(TRIGGER, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIGGER, LOW);
+  pinMode(TRIGGER, INPUT);
+  int ultrasonicTime = pulseIn(TRIGGER, HIGH, 30000); //56ms per cm if ultrasonicTime > 600, nudgeright
+  delay(1000);
+  return ultrasonicTime;
+}
+
+int getIR()
+{
+  digitalWrite(IR_PIN, HIGH);
+  delay(10);
+  int reading = analogRead(IR_PIN); // Replace 'IR_DETECTOR_PIN' with your actual IR sensor pin
+  digitalWrite(IR_PIN, LOW);
+  return reading;
+}
+
+void takeActionBasedOnColor(const int colourRes) {
+  // red : left
+  // green : right
+  // orange : 180deg within grid
+  // pink : 2 left
+  // light blue : 2 right
+  switch (colourRes) {
+    case 1: turnLeft(); break;
+    case 2: turnRight(); break;
+    case 3: uTurn(); break;
+    case 4: doubleLeftTurn(); break;
+    case 5: doubleRightTurn(); break;
+  }
+}
 
