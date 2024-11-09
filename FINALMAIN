@@ -1,9 +1,10 @@
 #include <MeMCore.h>
 
 #define LDR_PIN A0         // Define the LDR pin on A6
-//MeRGBLed led(7);           // Define the RGB LED on pin 7
+MeRGBLed led(7);           // Define the RGB LED on pin 7
 
-#define DELAY_TIME 200     // Delay time in milliseconds to allow LDR to stabilize
+#define DELAY_TIME 300     // Delay time in milliseconds to allow LDR to stabilize
+#define LDRWait 20
 #define MAXLED 255         // Maximum LED brightness
 #define IR_PIN A1  // Define the pin for the IR emitter
 #define BLACK_THRESHOLD 500 // Define the threshold value for black line detection (adjust based on testing)
@@ -14,6 +15,7 @@
 
 MeDCMotor motor_left(M1);   // Declare the left motor on port M1
 MeDCMotor motor_right(M2);  // Declare the right motor on port M2
+MeLineFollower          lineFinder(PORT_2); 
 
 #define TRIGGER A3
 #define IR_PIN1 11
@@ -28,7 +30,8 @@ buzzer.tone(392, 200);
   buzzer.tone(784, 200);
   buzzer.tone(659, 150);
   buzzer.tone(784, 400);
-  buzzer.noTone();// Code for playing celebratory tune}
+  buzzer.noTone();// Code for playing celebratory tune
+}
 
 void stopMotor() {
   motor_left.run(0);
@@ -131,18 +134,20 @@ void shineIR() {
   digitalWrite(IR_PIN, HIGH);   // Turn on the IR emitter
 // Code for turning on the IR emitter only
 }
-void shineRed() {
-  led.setColor(255, 0, 0);  // Set LED to red (255 for red, 0 for green, 0 for blue)
-  led.show();               // Apply the color setting to the LED// Code for turning on the red LED only
+
+int getAvgReading(int times) {
+  //find the average reading for the requested number of times of scanning LDR
+  int reading;
+  int total = 0;
+  //take the reading as many times as requested and add them up
+  for (int i = 0; i < times; i++) {
+    reading = analogRead(LDR_PIN);
+    total = reading + total;
+    delay(LDRWait);
   }
-void shineGreen() {
-  led.setColor(0, 255, 0);  // Set LED to green (0 for red, 255 for green, 0 for blue)
-  led.show();               // Apply the color setting to the LED// Code for turning on the green LED only
-  }
-void shineBlue() {
-  led.setColor(0, 0, 255);  // Set LED to blue (0 for red, 0 for green, 255 for blue)
-  led.show();               // Apply the color setting to the LED// Code for turning on the blue LED only
-  }
+  //calculate the average and return it
+  return total / times;
+}
 
 int detectColour()
 {
@@ -152,7 +157,7 @@ int detectColour()
   digitalWrite(11, LOW);
   digitalWrite(12, LOW);
   delay(DELAY_TIME);               // Wait for light to stabilize
-  colourArray[0] = ((analogRead(LDR_PIN) - black[0]) / greyDiff[0]) * 255;
+  colourArray[0] = getAvgReading(5);
   Serial.print("Red value: ");
   Serial.println(colourArray[0]);
 
@@ -160,7 +165,7 @@ int detectColour()
   digitalWrite(11, LOW);
   digitalWrite(12, HIGH);
   delay(DELAY_TIME);
-  colourArray[1] = ((analogRead(LDR_PIN) - black[1]) / greyDiff[1]) * 255;
+  colourArray[1] = getAvgReading(5);
   Serial.print("Green value: ");
   Serial.println(colourArray[1]);
 
@@ -168,24 +173,24 @@ int detectColour()
   digitalWrite(11, HIGH);
   digitalWrite(12, LOW);
   delay(DELAY_TIME);
-  colourArray[2] = ((analogRead(LDR_PIN) - black[2]) / greyDiff[2]) * 255;
+  colourArray[2] = getAvgReading(5);
   Serial.print("Blue value: ");
   Serial.println(colourArray[2]);
 
   // Turn off LED after reading
-  led.setColor(0, 0, 0);
-  led.show();
+  digitalWrite(11, HIGH);
+  digitalWrite(12, HIGH);
 
   // Algorithm to decode color based on RGB readings
   int detectedColor = -1;
   float minDistance = 5000;  // Minimum distance threshold for comparison
   static float predefinedColors[6][3] = { 
-    {255, 255, 255},    // White
-    {185, 35, 35},      // Red
-    {45, 100, 60},      // Green
-    {255, 165, 0},      // Orange
-    {255, 192, 203},    // Pink
-    {173, 216, 230}     // Light Blue
+    {1006, 984, 370},    // White
+    {993, 928, 318},      // Red
+    {1003, 960, 297},      // Green
+    {998, 930, 326},      // Orange
+    {1004, 975, 343},    // Pink
+    {1002, 980, 296}     // Light Blue
   };
 
   for (int i = 0; i < 6; i++) {
@@ -282,7 +287,7 @@ void takeActionBasedOnColor(const int colourRes) {
   // light blue : 2 right
   // white : Stop, play celebratory music
   switch (colourRes) {
-    case 0: stopMotor(); celebrate(); break:
+    case 0: stopMotor(); celebrate(); break;
     case 1: turnLeft(); break;
     case 2: turnRight(); break;
     case 3: uTurn(); break;
