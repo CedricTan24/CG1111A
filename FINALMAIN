@@ -1,0 +1,157 @@
+#include <MeMCore.h>
+
+#define LDR_PIN A0         // Define the LDR pin on A6
+//MeRGBLed led(7);           // Define the RGB LED on pin 7
+
+#define DELAY_TIME 200     // Delay time in milliseconds to allow LDR to stabilize
+#define MAXLED 255         // Maximum LED brightness
+#define IR_PIN A1  // Define the pin for the IR emitter
+#define BLACK_THRESHOLD 500 // Define the threshold value for black line detection (adjust based on testing)
+
+#define LEFT_SENSOR_PIN A1 //IR Sensor
+#define LEFT_WALL_THRESHOLD 5    // Threshold in cm for left wall proximity
+#define RIGHT_WALL_THRESHOLD 5   // Threshold in cm for right wall proximity
+
+MeDCMotor motor_left(M1);   // Declare the left motor on port M1
+MeDCMotor motor_right(M2);  // Declare the right motor on port M2
+
+#define TRIGGER A3
+#define IR_PIN1 11
+#define IR_PIN2 12
+
+MeBuzzer buzzer;  // Declare the buzzer
+
+void celebrate() {
+buzzer.tone(392, 200);
+  buzzer.tone(523, 200);
+  buzzer.tone(659, 200);
+  buzzer.tone(784, 200);
+  buzzer.tone(659, 150);
+  buzzer.tone(784, 400);
+  buzzer.noTone();// Code for playing celebratory tune}
+
+void stopMotor() {
+  motor_left.run(0);
+  motor_right.run(0);
+}
+
+void moveForward() {
+  motor_left.run(255);
+  motor_right.run(-255);
+}
+
+void turnRight() {
+  motor_left.run(255);   // Run the left motor at full speed
+  motor_right.run(50);   // Run the right motor at half speed for a smoother turn
+  delay(2000);
+  motor_left.run(255);
+  motor_right.run(255);
+}
+
+void turnLeft() { 
+  motor_left.run(50);   // Run the left motor at full speed
+  motor_right.run(255);   // Run the right motor at half speed for a smoother turn
+  delay(2000);
+  motor_left.run(255);
+  motor_right.run(255);
+  }
+
+void uTurn() {
+  motor_left.run(100);    // Run the left motor forward
+  motor_right.run(-100);  // Run the right motor backward
+  // Adjust the delay to control the time needed for a full U-turn (about 180 degrees)
+  delay(1500);  // Adjust this value based on testing (e.g., 1500 milliseconds for 1.5 seconds)
+  // Stop the motors after the U-turn
+  motor_left.run(0);   
+  motor_right.run(0);
+  }
+
+void doubleLeftTurn() {
+  motor_left.run(-100);  // Left motor backward
+  motor_right.run(100);  // Right motor forward
+
+  delay(700);  // Adjust the delay to achieve a 90-degree left turn
+
+  // Move forward between the turns:
+  motor_left.run(100);  // Both motors forward
+  motor_right.run(100);
+
+  delay(1000);  // Move forward for 1 second (adjust as needed)
+
+  // Second left turn (90 degrees):
+  motor_left.run(-100);  // Left motor backward
+  motor_right.run(100);  // Right motor forward
+
+  delay(700);  // Adjust this delay for the second 90-degree left turn
+
+  // Stop both motors after the second turn:
+  motor_left.run(0);
+  motor_right.run(0);
+}
+
+void doubleRightTurn() {
+// First right turn (90 degrees):
+  motor_left.run(100);   // Left motor forward
+  motor_right.run(-100); // Right motor backward
+
+  delay(700);  // Adjust the delay to achieve a 90-degree right turn
+
+  // Move forward between the turns:
+  motor_left.run(100);  // Both motors forward
+  motor_right.run(100);
+
+  delay(1000);  // Move forward for 1 second (adjust as needed)
+
+  // Second right turn (90 degrees):
+  motor_left.run(100);   // Left motor forward
+  motor_right.run(-100); // Right motor backward
+
+  delay(700);  // Adjust this delay for the second 90-degree right turn
+
+  // Stop both motors after the second turn:
+  motor_left.run(0);
+  motor_right.run(0);
+// Code for double right turn
+}
+
+
+void nudgeLeft() {
+  motor_left.run(100);
+  motor_right.run(-100);
+  delay(500);
+}
+
+void nudgeRight() {
+  motor_left.run(-100);
+  motor_right.run(100);
+  delay(500);
+}
+void shineIR() {// Code for turning on the IR emitter only}
+void shineRed() {// Code for turning on the red LED only}
+void shineGreen() {// Code for turning on the green LED only}
+void shineBlue() {// Code for turning on the blue LED only}
+
+int detectColour()
+{
+// Shine Red, read LDR after some delay
+// Shine Green, read LDR after some delay
+// Shine Blue, read LDR after some delay
+// Run algorithm for colour decoding
+}
+
+void setup()
+{
+// Configure pinMode for A0, A1, A2, A3
+}
+
+void loop()
+{
+// Read ultrasonic sensing distance (choose an appropriate timeout)
+// Read IR sensing distance (turn off IR, read IR detector, turn on IR, read IR detector, estimate distance)
+// if within black line, stop motor, detect colour, and take corresponding action
+// 	else if too near to left wall, nudge right
+// 	else if too near to right wall, nudge left
+// 	else move forward
+}
+
+
