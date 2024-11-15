@@ -1,6 +1,6 @@
 #include <MeMCore.h>
 
-#define LDR_PIN A0 // Define the LDR pin on A6
+#define LDR_PIN A0 // Define the LDR pin on A0
 #define IR_PIN A1  // Define the pin for the IR emitter
 
 #define DELAY_TIME 200     // Delay time in milliseconds to allow LDR to stabilize
