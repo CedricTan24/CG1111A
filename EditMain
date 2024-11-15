@@ -1,0 +1,326 @@
+#include <MeMCore.h>
+
+#define LDR_PIN A0 // Define the LDR pin on A6
+#define IR_PIN A1  // Define the pin for the IR emitter
+
+#define DELAY_TIME 200     // Delay time in milliseconds to allow LDR to stabilize
+#define LDRWait 20
+
+MeDCMotor motor_left(M1);   // Declare the left motor on port M1
+MeDCMotor motor_right(M2);  // Declare the right motor on port M2
+MeLineFollower lineFinder(PORT_2); // Declare linesensor on Port_2
+
+#define TRIGGER A3 // Declare Ultrasonic Trigger Pin
+#define DECODER1 11
+#define DECODER2 12
+
+MeBuzzer buzzer;  // Declare the buzzer
+
+void celebrate() { // Play celebratory music
+ buzzer.tone(264, 300); // C4
+  delay(100);
+  buzzer.tone(264, 300); // C4
+  delay(100);
+  buzzer.tone(264, 600); // C4
+  delay(100);
+  buzzer.tone(264, 300); // C4
+  delay(100);
+  buzzer.tone(264, 300); // C4
+  delay(100);
+  buzzer.tone(264, 600); // C4
+  delay(100);
+  
+  buzzer.tone(330, 300); // E4
+  delay(100);
+  buzzer.tone(330, 300); // E4
+  delay(100);
+  buzzer.tone(330, 600); // E4
+  delay(100);
+  buzzer.tone(330, 300); // E4
+  delay(100);
+  buzzer.tone(330, 300); // E4
+  delay(100);
+  buzzer.tone(349, 600); // F4
+  delay(100);
+
+  // Second phrase: Oh! What fun it is to ride in a one-horse open sleigh
+  buzzer.tone(392, 300); // G4
+  delay(100);
+  buzzer.tone(392, 300); // G4
+  delay(100);
+  buzzer.tone(392, 300); // G4
+  delay(100);
+  buzzer.tone(330, 300); // E4
+  delay(100);
+  buzzer.tone(330, 300); // E4
+  delay(100);
+  buzzer.tone(330, 300); // E4
+  delay(100);
+}
+
+void stopMotor() {
+  motor_left.run(0); // Left motor stop
+  motor_right.run(0); // Right motor stop
+}
+
+void moveForward() {
+  motor_left.run(-225); // Left motor forward
+  motor_right.run(225); // Right motor forward
+}
+
+void turnRight() {
+  motor_left.run(-255);   // Left motor forward
+  motor_right.run(-255);   // Right motor backward
+  delay(275); // Time taken for turn
+}
+
+void turnLeft() { 
+  motor_left.run(255);   // Left motor backward
+  motor_right.run(255);   // Rught motor forward
+  delay(280); // Time taken for turn
+  }
+
+void uTurn() { 
+  // Bigger turnLeft
+  motor_left.run(255);    // Left motor backward
+  motor_right.run(255);  // Right motor forward
+  // Adjust the delay to control the time needed for a full U-turn (about 180 degrees)
+  delay(610);  // Adjust this value based on testing (e.g., 1500 milliseconds for 1.5 seconds)
+  // Stop the motors after the U-turn
+  motor_left.run(0);   
+  motor_right.run(0);
+  }
+
+void doubleLeftTurn() { 
+  // First left turn (90 degrees)
+  motor_left.run(255);  // Left motor backward
+  motor_right.run(255);  // Right motor forward
+
+  delay(310);  // Adjust the delay to achieve a 90-degree left turn
+
+  // Move forward between the turns:
+  moveForward();
+
+  delay(750);  // Time taken for MoveForward
+
+  // Second left turn (90 degrees)
+  motor_left.run(255);  // Left motor backward
+  motor_right.run(255);  // Right motor forward
+
+  delay(310);  // Adjust this delay for the second 90-degree left turn
+}
+
+void doubleRightTurn() {
+  // First right turn (90 degrees)
+  motor_left.run(-255);   // Left motor forward
+  motor_right.run(-255); // Right motor backward
+
+  delay(320);  // Adjust the delay to achieve a 90-degree right turn
+
+  // Move forward between the turns:
+  moveForward();
+
+  delay(750);  // Time taken for MoveForward
+
+  // Second right turn (90 degrees):
+  motor_left.run(-255);   // Left motor forward
+  motor_right.run(-255); // Right motor backward
+
+  delay(300);  // Adjust this delay for the second 90-degree right turn
+}
+
+
+void nudgeLeft() {
+  motor_left.run(-75); // Left motor forward
+  motor_right.run(-75); // Right motor backward
+  delay(120); // Time taken for nudge
+}
+
+void nudgeRight() {
+  motor_left.run(75); // Left motor backward
+  motor_right.run(75); // Right motor forward
+  delay(120); // Time taken for nudge
+}
+void shineIR() {
+  // Code for turning on the IR emitter only
+  pinMode(IR_PIN, OUTPUT);      // Set the IR pin as an output
+  digitalWrite(IR_PIN, HIGH);   // Turn on the IR emitter
+}
+
+void shineRed(){
+  // Code for turning on the Red LED
+  digitalWrite(11, HIGH);
+  digitalWrite(12, HIGH);
+}
+
+void shineGreen(){
+  // Code for turning on the Green LED
+  digitalWrite(11, LOW);
+  digitalWrite(12, HIGH);
+}
+
+void shineBlue(){
+  // Code for turning on the Blue LED
+  digitalWrite(11, HIGH);
+  digitalWrite(12, LOW);
+}
+
+int getAvgReading(int times) {
+  // Find the average reading for the requested number of times of scanning LDR
+  int reading;
+  int total = 0;
+  // Take the reading as many times as requested and add them up
+  for (int i = 0; i < times; i++) {
+    reading = analogRead(LDR_PIN);
+    total = reading + total;
+    delay(LDRWait);
+  }
+  // Calculate the average and return it
+  return total / times;
+}
+char colourStr[3][5] = { "R = ", "G = ", "B = " };
+
+int detectColour()
+{
+  // Detect colour on the floor using an array of predefined colour values via calibration
+  float colourArray[3] = {0};
+
+  for (int c = 0; c <= 2; c++){
+    if(c == 0){shineRed();}
+    if(c == 1){shineGreen();}
+    if(c == 2){shineBlue();}
+
+  delay(DELAY_TIME);
+  colourArray[c] = getAvgReading(5);
+  delay(DELAY_TIME);
+  Serial.print(colourStr[c]);
+  Serial.println(colourArray[c]);}
+
+  // Algorithm to decode color based on RGB readings
+  int detectedColor = -1;
+  float minDistance = 100000;  // Minimum distance threshold for comparison
+  static float predefinedColors[6][3] = { 
+    {809, 944, 873},    // White 0
+    {809, 894, 785},      // Red 1
+    {773, 925, 808},      // Green 2
+    {801, 906, 774},      // Orange 3
+    {833, 934, 868},    // Pink 4
+    {743, 919, 847}     // Light Blue 5
+  };
+
+  for (int i = 0; i < 6; i++) {
+    float distance = 0;
+    for (int j = 0; j < 3; j++) {
+      distance += (predefinedColors[i][j] - colourArray[j]) * (predefinedColors[i][j] - colourArray[j]);
+    }
+    distance = sqrt(distance);
+    if (distance < minDistance) {
+      minDistance = distance;
+      detectedColor = i;
+    }
+  }
+
+  // Output the detected color to Serial Monitor
+  Serial.print("Detected color index: ");
+  Serial.println(detectedColor);
+
+  return detectedColor;  // Return the index of the detected color
+}
+
+void setup()
+{
+  //pinMode()
+  Serial.begin(9600);
+  pinMode(A1, INPUT);
+  pinMode(TRIGGER, OUTPUT);
+  digitalWrite(TRIGGER, LOW);
+  pinMode(11, OUTPUT);
+  pinMode(12, OUTPUT);
+  digitalWrite(11, LOW);
+  digitalWrite(12, LOW);
+
+  // Set initial state for IR emitter
+  digitalWrite(IR_PIN, LOW);  // Ensure IR emitter is off
+}
+
+void loop()
+{
+int ULTRASONIC = getUltrasonic(); // Read ultrasonic sensing distance 
+int IR = getIR(); // Read IR sensing distance 
+
+// Print Ultrasonic & IR reading to serial monitor
+Serial.print("Ultrasonic Reading: ");
+Serial.println(ULTRASONIC);
+Serial.print("IR Reading: ");
+Serial.println(IR);
+
+// Linesensor
+int sensorState = lineFinder.readSensors();
+Serial.println(sensorState);
+if (sensorState == S1_IN_S2_IN) { // Check if linesensor detects black line
+  stopMotor();
+  int color = detectColour();           // Detect colour when on black line
+  if (color == 0) { // If white colour detected, perform action once and play music, does not enter back loop
+    takeActionBasedOnColor(color);  
+    return;
+  }
+  takeActionBasedOnColor(color);       // Take action based on detected color
+} 
+else if (ULTRASONIC < 430 && ULTRASONIC > 1) // If too close to left wall, nudgeRight
+{
+nudgeLeft();
+} 
+else if (IR > 400) // Else if too close to right wall, nudgeLeft
+{
+nudgeRight();
+} 
+else // Else moveForward if not close to both side of the walls & no black line
+{
+moveForward(); 
+} 
+}
+
+int getUltrasonic()
+{
+  pinMode(TRIGGER, OUTPUT);
+  digitalWrite(TRIGGER, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIGGER, LOW);
+  pinMode(TRIGGER, INPUT);
+  int ultrasonicTime = pulseIn(TRIGGER, HIGH, 30000); //56ms per cm if ultrasonicTime > 600, nudgeright
+  delay(10);
+  return ultrasonicTime;
+}
+
+int getIR()
+{
+  digitalWrite(11, HIGH);
+  digitalWrite(12, LOW);
+  delay(10);
+  int reading_off = analogRead(IR_PIN);
+  digitalWrite(11, LOW);
+  digitalWrite(12, LOW);
+  delay(10);
+  int reading_on = analogRead(IR_PIN);
+  int reading = reading_off - reading_on;
+  return reading;
+}
+
+void takeActionBasedOnColor(const int colourRes) {
+  // red : left
+  // green : right
+  // orange : 180deg within grid
+  // pink : 2 left
+  // light blue : 2 right
+  // white : Stop, play celebratory music
+  
+  switch (colourRes) {
+    case 0: stopMotor(); celebrate(); break;
+    case 1: turnLeft(); break;
+    case 2: turnRight(); break;
+    case 3: uTurn(); break;
+    case 4: doubleLeftTurn(); break;
+    case 5: doubleRightTurn(); break;
+  }
+  
+}
